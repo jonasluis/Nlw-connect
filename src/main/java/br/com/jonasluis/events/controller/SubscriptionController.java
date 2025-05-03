@@ -2,6 +2,7 @@ package br.com.jonasluis.events.controller;
 
 import br.com.jonasluis.events.dto.ErrorMessage;
 import br.com.jonasluis.events.exception.EventNotFoundException;
+import br.com.jonasluis.events.exception.SubscripitionConclictException;
 import br.com.jonasluis.events.model.Subscription;
 import br.com.jonasluis.events.model.User;
 import br.com.jonasluis.events.service.SubscriptionService;
@@ -26,6 +27,8 @@ public class SubscriptionController {
       }
      } catch (EventNotFoundException ex) {
       return ResponseEntity.status(404).body(new ErrorMessage(ex.getMessage()));
+    } catch (SubscripitionConclictException ex){
+      return ResponseEntity.status(409).body(new ErrorMessage(ex.getMessage()));
     }
       return ResponseEntity.badRequest().build();
   }

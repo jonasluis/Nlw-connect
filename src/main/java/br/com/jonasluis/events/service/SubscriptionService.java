@@ -1,6 +1,7 @@
 package br.com.jonasluis.events.service;
 
 import br.com.jonasluis.events.exception.EventNotFoundException;
+import br.com.jonasluis.events.exception.SubscripitionConclictException;
 import br.com.jonasluis.events.model.Event;
 import br.com.jonasluis.events.model.Subscription;
 import br.com.jonasluis.events.model.User;
@@ -34,6 +35,14 @@ public class SubscriptionService {
     Subscription subscription = new Subscription();
     subscription.setEvent(event);
     subscription.setSubscriber(userRec);
+
+    Subscription tmpSub = subscriptionRepository.findByEventAndSubscriber(event, userRec);
+    if (tmpSub != null){
+      throw new SubscripitionConclictException("Ja existe inscrição para o usuário "
+              + userRec.getName() + " no evento "
+              + eventName);
+    }
+
 
     Subscription res = subscriptionRepository.save(subscription);
 

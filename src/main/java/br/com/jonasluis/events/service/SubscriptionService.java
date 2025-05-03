@@ -1,5 +1,6 @@
 package br.com.jonasluis.events.service;
 
+import br.com.jonasluis.events.dto.SubscriptionResponse;
 import br.com.jonasluis.events.exception.EventNotFoundException;
 import br.com.jonasluis.events.exception.SubscripitionConclictException;
 import br.com.jonasluis.events.model.Event;
@@ -21,7 +22,7 @@ public class SubscriptionService {
   @Autowired
   private SubscriptionRepository subscriptionRepository;
 
-  public Subscription createNewSubscription(String eventName, User user){
+  public SubscriptionResponse createNewSubscription(String eventName, User user){
     //recuperar o evento pelo nome
     Event event = eventRepository.findByPrettyName(eventName);
     if (event == null){
@@ -46,6 +47,6 @@ public class SubscriptionService {
 
     Subscription res = subscriptionRepository.save(subscription);
 
-    return res;
+    return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
   }
 }

@@ -3,6 +3,7 @@ package br.com.jonasluis.events.service;
 import br.com.jonasluis.events.dto.SubscriptionResponse;
 import br.com.jonasluis.events.exception.EventNotFoundException;
 import br.com.jonasluis.events.exception.SubscripitionConclictException;
+import br.com.jonasluis.events.exception.UserIndicadorNotFoundException;
 import br.com.jonasluis.events.model.Event;
 import br.com.jonasluis.events.model.Subscription;
 import br.com.jonasluis.events.model.User;
@@ -22,7 +23,7 @@ public class SubscriptionService {
   @Autowired
   private SubscriptionRepository subscriptionRepository;
 
-  public SubscriptionResponse createNewSubscription(String eventName, User user){
+  public SubscriptionResponse createNewSubscription(String eventName, User user, Integer userId ){
     //recuperar o evento pelo nome
     Event event = eventRepository.findByPrettyName(eventName);
     if (event == null){
@@ -33,9 +34,16 @@ public class SubscriptionService {
       userRec = userRepository.save(user);
     }
 
+    User indicador = userRepository.findById(userId).orElse(null);
+    if(indicador == null){
+      throw  new UserIndicadorNotFoundException("Usuario"+userId+" indicador não existe");
+    }
+
     Subscription subscription = new Subscription();
     subscription.setEvent(event);
     subscription.setSubscriber(userRec);
+    subscription.setIndication(indicador);
+
 
     Subscription tmpSub = subscriptionRepository.findByEventAndSubscriber(event, userRec);
     if (tmpSub != null){
@@ -47,6 +55,6 @@ public class SubscriptionService {
 
     Subscription res = subscriptionRepository.save(subscription);
 
-    return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
+    return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/subscription"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
   }
 }

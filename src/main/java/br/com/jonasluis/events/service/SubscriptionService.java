@@ -1,5 +1,6 @@
 package br.com.jonasluis.events.service;
 
+import br.com.jonasluis.events.dto.SubscriptionRankingItem;
 import br.com.jonasluis.events.dto.SubscriptionResponse;
 import br.com.jonasluis.events.exception.EventNotFoundException;
 import br.com.jonasluis.events.exception.SubscripitionConclictException;
@@ -12,6 +13,8 @@ import br.com.jonasluis.events.repository.SubscriptionRepository;
 import br.com.jonasluis.events.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SubscriptionService {
@@ -57,5 +60,14 @@ public class SubscriptionService {
     Subscription res = subscriptionRepository.save(subscription);
 
     return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/subscription"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
+  }
+
+  public List<SubscriptionRankingItem> getCompleteRanking(String prettyName){
+    Event event = eventRepository.findByPrettyName(prettyName);
+    if (event == null) {
+      throw new EventNotFoundException("Ranking do evento " + prettyName + " não existe!");
+
+    }
+    return  subscriptionRepository.generateRanking(event.getEventId());
   }
 }

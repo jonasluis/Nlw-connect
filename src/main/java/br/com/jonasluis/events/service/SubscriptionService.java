@@ -4,6 +4,7 @@ import br.com.jonasluis.events.dto.SubscriptionRankingItem;
 import br.com.jonasluis.events.dto.SubscriptionResponse;
 import br.com.jonasluis.events.exception.EventNotFoundException;
 import br.com.jonasluis.events.exception.SubscripitionConclictException;
+import br.com.jonasluis.events.exception.SubscriptionRankingByUser;
 import br.com.jonasluis.events.exception.UserIndicadorNotFoundException;
 import br.com.jonasluis.events.model.Event;
 import br.com.jonasluis.events.model.Subscription;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Service
 public class SubscriptionService {
@@ -69,5 +71,18 @@ public class SubscriptionService {
 
     }
     return  subscriptionRepository.generateRanking(event.getEventId());
+  }
+
+  public SubscriptionRankingByUser getRankingByUser(String prettyName, Integer userId){
+    List<SubscriptionRankingItem> ranking = getCompleteRanking(prettyName);
+    SubscriptionRankingItem item = ranking.stream().filter(i -> i.userId().equals(userId)).findFirst().orElse(null);
+    if (item == null){
+      throw new UserIndicadorNotFoundException("Não há inscrições com indicção do usuario "+ userId);
+    }
+
+    Integer posicao = IntStream.range(0, ranking.size())
+            .filter(pos-> ranking.get(pos).userId().equals(userId))
+            .findFirst().getAsInt();
+    return new SubscriptionRankingByUser(item, posicao + 1);
   }
 }

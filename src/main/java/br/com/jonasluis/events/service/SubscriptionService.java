@@ -61,7 +61,7 @@ public class SubscriptionService {
 
     Subscription res = subscriptionRepository.save(subscription);
 
-    return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/subscription"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
+    return new SubscriptionResponse(res.getSubscriptionNumber(), "http://codecraft.com/subscription/"+ res.getEvent().getPrettyName()+"/"+ res.getSubscriber().getId());
   }
 
   public List<SubscriptionRankingItem> getCompleteRanking(String prettyName){
